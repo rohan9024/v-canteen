@@ -13,9 +13,11 @@ import CartContext from './Contexts/CartContext';
 export default function App() {
   const Stack = createNativeStackNavigator();
   const [user, setUser] = useState(null);
+  const [staff, setStaff] = useState(null);
+  const [admin, setAdmin] = useState(null);
 
   return (
-    <LoginContext.Provider value={{ user, setUser }}>
+    <LoginContext.Provider value={{ user, setUser, staff, setStaff, admin, setAdmin }}>
       <CartContext>
         <NavigationContainer>
           <StackNavigator />

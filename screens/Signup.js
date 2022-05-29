@@ -103,9 +103,6 @@ const Signup = () => {
                         }} >Sign Up</Text>
                     </View>
                 </TouchableOpacity>
-                <TouchableOpacity style={{ marginTop: 30 }}>
-                    <Text style={{ fontSize: 15 }} onPress={() => navigation.navigate('AdminLogin')}>Are you admin?</Text>
-                </TouchableOpacity>
 
             </View>
         </View>

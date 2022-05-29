@@ -1,4 +1,5 @@
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import { disableExpoCliLogging } from 'expo/build/logs/Logs';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import React, { useState, useContext } from 'react';
 import { Button, Image, ScrollView, Text, TextInput, View, TouchableOpacity, Pressable } from 'react-native';
@@ -12,6 +13,7 @@ const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
+    const [id, setID] = useState('');
     const [view, setView] = useState(false);
     const navigation = useNavigation();
     const [checkUsername, setCheckUsername] = useState(false)
@@ -19,48 +21,38 @@ const Login = () => {
     const { user, setUser } = useContext(LoginContext);
 
     const Signin = () => {
-        const verifyManager = async () => {
-            const q = query(collection(db, "users"), where("username", "==", username));
-            const querySnapshot = await getDocs(q);
-            if (querySnapshot) {
-                setCheckUsername(true);
-                const pq = query(collection(db, "users"), where("password", "==", password));
-                const querySnapshotP = await getDocs(pq);
-                if (querySnapshotP) {
-                    setcheckpass(true);
-                    console.log(checkUsername)
-                    console.log(checkpass)
-                    alert(`Logged successfully`)
-                    setUsername('')
-                    setPassword('')
-                    const q = query(collection(db, "users"), where("username", "==", username));
-                    const querySnapshot = await getDocs(q);
-                    querySnapshot.forEach((doc) => {
-                        setName(doc.data().name)
-                    });
+
+        if (username && password) {
+            const verifyUser = async () => {
+                const q = query(collection(db, "users"), where("username", "==", username), where("password", "==", password));
+                const querySnapshot = await getDocs(q);
+                querySnapshot.forEach((doc) => {
                     setUser({
-                        name: name,
+                        id: doc.id,
+                        name: doc.data().name,
                         username: username,
                         password: password,
                     })
                     navigation.navigate('Home')
-                }
-                else {
-                    setcheckpass(false)
-                    alert('Wrong Password. Try again')
-                }
+                });
             }
-            else {
-                alert('Wrong Username')
-            }
-
+            verifyUser()
         }
-        verifyManager()
+        else if (!username && password) {
+            alert("Please enter username")
+        }
+        else if (username && !password) {
+            alert("Please enter password")
+        }
+        else {
+            alert("Missing details")
+        }
+
     }
 
     return (
         <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flex: 1 }}>
-            <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 60 }}>
+            <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 130 }}>
                 <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginBottom: 20 }}>
                     <TextInput
                         style={{
@@ -101,9 +93,6 @@ const Login = () => {
                         }
                     </TouchableOpacity>
                 </View>
-                <Pressable style={{ marginLeft: 120, marginTop: 10 }}>
-                    <Text style={{ color: 'gray', fontSize: 14 }}>Forgot Password?</Text>
-                </Pressable>
                 <TouchableOpacity style={{ marginTop: 30 }} onPress={Signin}>
                     <View style={{
                         width: 200,
@@ -121,12 +110,12 @@ const Login = () => {
                         }} >Login</Text>
                     </View>
                 </TouchableOpacity>
-                <View style={{ display: 'flex', marginTop: 20, justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
-                    <View style={{ height: 1, width: 80, backgroundColor: 'red' }} />
+                <View style={{ display: 'flex', marginTop: 10, justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
+                    <View style={{ height: 1, width: 30, backgroundColor: 'red' }} />
                     <Text style={{ color: 'red', fontWeight: 'bold' }}>OR</Text>
-                    <View style={{ height: 1, width: 80, backgroundColor: 'red' }} />
+                    <View style={{ height: 1, width: 30, backgroundColor: 'red' }} />
                 </View>
-                <TouchableOpacity style={{ marginTop: 30 }} onPress={() => navigation.navigate('Signup')}>
+                <TouchableOpacity style={{ marginTop: 10 }} onPress={() => navigation.navigate('Signup')}>
                     <View style={{
                         width: 200,
                         height: 50,
@@ -144,9 +133,24 @@ const Login = () => {
                         }} >Sign Up</Text>
                     </View>
                 </TouchableOpacity>
-                <TouchableOpacity style={{ marginTop: 30 }}>
-                    <Text style={{ fontSize: 15 }} onPress={() => navigation.navigate('AdminLogin')}>Are you admin?</Text>
-                </TouchableOpacity>
+
+                <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row', marginTop: 20 }}>
+
+                    <TouchableOpacity style={{}} onPress={() => navigation.navigate('StaffLogin')}>
+                        <View style={{
+                            width: 200,
+                            height: 50,
+                            display: 'flex',
+                            justifyContent: 'space-evenly',
+                            alignItems: 'center',
+                        }}>
+                            <Text style={{
+                                color: 'black',
+                                fontSize: 15,
+                            }} >Are you staff member?</Text>
+                        </View>
+                    </TouchableOpacity>
+                </View>
 
             </View>
         </View>
